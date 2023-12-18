@@ -115,7 +115,3 @@ object BankAccountSqls {
 
   def make: BankAccountSqls = new Impl
 }
-
-// post login - по авторизации возвращает токен
-// get introspect - говорит активен ли токен
-// get userinfo - возвращает информацию о пользователе

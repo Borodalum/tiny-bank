@@ -53,5 +53,5 @@ private final class ClientRepositoryImpl[F[_] : MonadCancelThrow](
       .getIdByName(name, pass)
       .transact(transactor)
       .attempt
-      .leftMapIn(_ => UnexpectedDbError("SOMETHING WENT WRONG"))
+      .leftMapIn(err => UnexpectedDbError(err.getMessage))
 }

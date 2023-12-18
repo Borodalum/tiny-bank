@@ -3,6 +3,7 @@ version: "3.8"
 services:
   bank-db:
     image: postgres:14.5
+    container_name: bank-db
     ports:
       - "5432:5432"
     environment:
@@ -11,10 +12,11 @@ services:
       POSTGRES_DB: bank
     volumes:
       - postgres1:/data/postgres
-      - ./bank-module/database/bank.sql:/docker-entrypoint-initdb.d/bank.sql
+      - ./src/main/resources/bank.sql:/docker-entrypoint-initdb.d/init.sql
 
   sso-db:
     image: postgres:14.5
+    container_name: sso-db
     ports:
       - "5488:5432"
     environment:
@@ -23,19 +25,16 @@ services:
       POSTGRES_DB: sso
     volumes:
       - postgres2:/data/postgres
-      - ./bank-module/database/sso.sql:/docker-entrypoint-initdb.d/sso.sql
+      - ./src/main/resources/bank.sql:/docker-entrypoint-initdb.d/init.sql
+
   application:
-    build: target/docker/stage
-    image: docker.io/library/tiny-bank-application:latest
-    environment:
-      DB_URL: db
-      DB_NAME: bank
-      DB_PASS: test1234
-      DB_USER: test
+    image: docker.io/library/tiny-bank:1.0
+    network_mode: "host"
     ports:
-      - "8080:8080"
+      - "1234:1234"
     depends_on:
       - bank-db
+      - sso-db
 volumes:
   postgres1:
   postgres2:

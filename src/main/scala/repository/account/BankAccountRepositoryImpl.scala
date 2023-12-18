@@ -18,7 +18,7 @@ private final class BankAccountRepositoryImpl[F[_] : MonadCancelThrow](
       .transact(transactor)
       .attempt
       .map {
-        case Left(th) => UnexpectedDbError("penis").asLeft[BankAccount]
+        case Left(th) => UnexpectedDbError(th.getMessage).asLeft[BankAccount]
         case Right(acc) => acc.asRight
       }
 

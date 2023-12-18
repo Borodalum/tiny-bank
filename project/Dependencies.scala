@@ -31,4 +31,20 @@ object Dependencies {
     "org.http4s" %% "http4s-circe" % http4sVersion,
   )
   val ioEstatico = "io.estatico" %% "newtype" % "0.4.4"
+
+  val tapirVersion = "1.9.0"
+  val tapir = Seq(
+    "com.softwaremill.sttp.tapir" %% "tapir-core" % tapirVersion,
+    "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
+    "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
+    "com.softwaremill.sttp.tapir" %% "tapir-derevo" % tapirVersion,
+    "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion
+  )
+
+  val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.17.4"
+
+  val mock = Seq (
+    "org.scalamock" %% "scalamock" % "5.1.0" % Test,
+    "org.mockito" %% "mockito-scala-scalatest" % "1.16.42" % Test
+  )
 }

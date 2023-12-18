@@ -55,9 +55,9 @@ final class ServerController[F[_] : Monad](
   private val getBalanceBankAccServerEndpoint: ServerEndpoint[Any, F] =
     getBalanceBankAccountEndpoint
       .serverSecurityLogic(authService.authorize)
-      .serverLogic {_ => bankId =>
+      .serverLogic {clientId => bankId =>
         bankService
-          .getBalance(bankId)
+          .getBalance(clientId, bankId)
       }
 
   private val depositOnBankAccServerEndpoint: ServerEndpoint[Any, F] =
@@ -72,49 +72,19 @@ final class ServerController[F[_] : Monad](
   private val withdrawOnBankAccServerEndpoint: ServerEndpoint[Any, F] =
     withdrawOnBankAccountEndpoint
       .serverSecurityLogic(authService.authorize)
-      .serverLogic {_ => params =>
+      .serverLogic {clientId => params =>
         val (bankId, withdraw) = params
-//        bankAccountRepository
-//          .getBalanceById(bankId)
-//          .flatMap {
-//            case Left(_) => InternalServerApiError("Internal error occurred. Try later").asLeft[Unit].pure[F]
-//            case Right(Some(balance)) if balance.value >= withdraw.value =>
-//               bankAccountRepository
-//                .withdrawById(bankId, withdraw)
-//                .leftMapIn(_ => InternalServerApiError("Internal error occurred. Try later"))
-//            case Right(Some(_)) => NotEnoughMoneyApiError("Not enough money in bank account").asLeft[Unit].pure[F]
-//            case _ => BankAccNotFoundApiError("Bank account not found").asLeft[Unit].pure[F]
-//          }
-//          // костыль, но чет скала не хочет сабтайпинг видеть
-//          // - мб я не слишком глубоко природу этого понимаю
-//          .leftMapIn(apiErr => apiErr)
         bankService
-          .withdrawFromAcc(bankId, withdraw)
+          .withdrawFromAcc(clientId, bankId, withdraw)
       }
 
   private val transferFromBankAccServerEndpoint: ServerEndpoint[Any, F] =
     transferFromBankAccountEndpoint
       .serverSecurityLogic(authService.authorize)
-      .serverLogic {_ => params =>
+      .serverLogic {clientId => params =>
         val (bankIdFrom, transfer) = params
-//        bankAccountRepository
-//          .getBalanceById(bankIdFrom)
-//          .flatMap {
-//            case Left(_) => InternalServerApiError("Internal error occurred. Try later").asLeft[Unit].pure[F]
-//            case Right(Some(balance)) if balance.value >= transfer.amount.value =>
-//              bankAccountRepository
-//                .withdrawById(bankIdFrom, transfer.amount)
-//                .leftMapIn(_ => InternalServerApiError("Internal error occurred. Try later")) *> bankAccountRepository
-//                .depositById(transfer.bankIdTo, transfer.amount)
-//                .leftMapIn(_ => InternalServerApiError("Internal error occurred. Try later"))
-//            case Right(Some(_)) => NotEnoughMoneyApiError("Not enough money in bank account").asLeft[Unit].pure[F]
-//            case _ => BankAccNotFoundApiError("Bank account not found").asLeft[Unit].pure[F]
-//          }
-//          // костыль, но чет скала не хочет сабтайпинг видеть
-//          // - мб я не слишком глубоко природу этого понимаю
-//          .leftMapIn(apiErr => apiErr)
         bankService
-          .transfer(bankIdFrom, transfer)
+          .transfer(clientId, bankIdFrom, transfer)
       }
 
   val apiEndpoints: List[ServerEndpoint[Any, F]] =

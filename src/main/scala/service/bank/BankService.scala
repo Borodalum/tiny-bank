@@ -9,11 +9,11 @@ import repository.client.ClientRepository
 trait BankService[F[_]] {
   def register(client: CreateClient): F[Either[ApiError, Unit]]
   def createAcc(acc: CreateBankAccount): F[Either[ApiError, BankAccountId]]
-  def getBalance(id: BankAccountId): F[Either[ApiError, BankAccountBalance]]
-  def removeAcc(id: BankAccountId): F[Either[ApiError, Unit]]
+  def getBalance(clientId: ClientId, id: BankAccountId): F[Either[ApiError, BankAccountBalance]]
+  def removeAcc(clientId: ClientId, id: BankAccountId): F[Either[ApiError, Unit]]
   def depositToAcc(id: BankAccountId, amount: Money): F[Either[ApiError, Unit]]
-  def withdrawFromAcc(id: BankAccountId, amount: Money): F[Either[ApiError, Unit]]
-  def transfer(fromId: BankAccountId, accTransfer: BankAccountTransfer): F[Either[ApiError, Unit]]
+  def withdrawFromAcc(clientId: ClientId, id: BankAccountId, amount: Money): F[Either[ApiError, Unit]]
+  def transfer(clientId: ClientId, fromId: BankAccountId, accTransfer: BankAccountTransfer): F[Either[ApiError, Unit]]
 }
 
 object BankService {

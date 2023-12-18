@@ -23,5 +23,5 @@ private final class TokenRepositoryImpl[F[_] : MonadCancelThrow](
       .transact(transactor)
       .attempt
       .leftMapIn(err => UnexpectedDbError(err.getMessage))
-      .flatMapIn(_.toRight(NotFoundDbError("Something went wrong")))
+      .flatMapIn(_.toRight(NotFoundDbError("Client not found")))
 }

@@ -1,7 +1,7 @@
 import cats.effect.kernel.Sync
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits.catsSyntaxApplicativeId
-import com.comcast.ip4s.{IpLiteralSyntax, Port}
+import com.comcast.ip4s.{IpLiteralSyntax, Port, Host}
 import config.ServerConfig
 import controller.ServerController
 import module.DbModule
@@ -24,11 +24,11 @@ object Application extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] =
     (for {
-      _ <- println("Start").pure[App]
-      conf = ConfigSource.default
-      server <- Sync[Init].delay(conf.at("server").loadOrThrow[ServerConfig])
+      _            <- println("Bank started").pure[App]
+      conf         = ConfigSource.default
+      server       <- Sync[Init].delay(conf.at("server").loadOrThrow[ServerConfig])
       dbModuleBank <- DbModule.make[Init, App](conf, "bank-db")
-      dbModuleSso <- DbModule.make[Init, App](conf, "sso-db")
+      dbModuleSso  <- DbModule.make[Init, App](conf, "sso-db")
 
       clientSqls       = ClientSqls.make
       clientRepository = ClientRepository.make[App](clientSqls, dbModuleBank)
@@ -43,7 +43,7 @@ object Application extends IOApp {
 
       bankService      = BankService.make[App](bankAccountRepository, clientRepository)
 
-      controller = new ServerController[App](bankService, authService, clientRepository)
+      controller       = new ServerController[App](bankService, authService, clientRepository)
 
       openApi = OpenAPIDocsInterpreter()
         .toOpenAPI(es = controller.apiEndpoints.map(_.endpoint), "Tiny bank API", "0.1")
@@ -53,6 +53,7 @@ object Application extends IOApp {
       httpApp = Router("/" -> routes).orNotFound
       service: EmberServerBuilder[App] = EmberServerBuilder
         .default[App]
+        .withHost(Host.fromString(server.host).getOrElse(host"0.0.0.0"))
         .withPort(Port.fromInt(server.port).getOrElse(port"8080"))
         .withHttpApp(httpApp)
     } yield service)
